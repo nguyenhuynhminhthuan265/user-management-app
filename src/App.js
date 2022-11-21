@@ -2,6 +2,7 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import GroupManagement from "./components/GroupManagement";
 import SignUp from "./components/SignUp";
 import MemberManagement from "./components/MemberManagement";
+import Login from "./components/Login";
 
 function App() {
     return (
@@ -10,6 +11,7 @@ function App() {
                 <Routes>
                     <Route path='/' element={<SignUp/>}/>
                     <Route path='/sign-up' element={<SignUp/>}/>
+                    <Route path='/login' element={<Login/>}/>
                     <Route path='/groups' element={<GroupManagement/>}/>
                     <Route path='/groups/:groupId/members' element={<MemberManagement/>}/>
                 </Routes>

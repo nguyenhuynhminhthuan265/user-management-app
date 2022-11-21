@@ -36,9 +36,9 @@ export default function GroupManagement() {
         localStorage.removeItem("localGroups");
     }
 
-    const getMembersOfGroup = (groupId) => {
-        console.log(`groupId: ${groupId}`)
-        navigate(`/groups/${groupId}/members`)
+    const getMembersOfGroup = (group) => {
+        console.log(`groupId: ${group.groupId}`)
+        navigate(`/groups/${group.groupId}/members`, {state: group})
     }
     return (
         <div className="container row">
@@ -80,7 +80,7 @@ export default function GroupManagement() {
                         <button
                             className="form-control bg-white btn mt-2"
                             style={{textAlign: "left", fontWeight: "bold"}}
-                            onClick={() => getMembersOfGroup(group.groupId)}
+                            onClick={() => getMembersOfGroup(group)}
                         >
                             {group.groupName}
                         </button>

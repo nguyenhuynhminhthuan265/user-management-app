@@ -1,10 +1,16 @@
 import React, {useEffect, useState} from 'react'
-import {useNavigate} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
+import {useForm} from "react-hook-form";
+import uuid from "react-uuid";
 
 function MemberManagement() {
-    const [user, setUser] = useState({userId: "", username: "", email: "", isAdmin: ""});
+    const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
+    const [user, setUser] = useState({userId: "", username: "", email: "", role: ""});
+    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [users, setUsers] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
     useEffect(() => {
         if (!localStorage.getItem("sessionId")) {
             navigate('/sign-up')
@@ -13,14 +19,34 @@ function MemberManagement() {
             const storedList = JSON.parse(localStorage.getItem("localUsers"));
             setUsers(storedList);
         }
+        console.log(`location: ${location}`);
+        console.log(`location: ${location.state.groupId}`);
+        setUsers(location.state.members ? location.state.members : [])
     }, [])
 
-    const addGroup = (e) => {
+    function handleChange(evt) {
+        console.log(`element onchange user: `, evt);
+        const value = evt.target.value;
+        setUser({
+            ...user,
+            [evt.target.name]: value
+        });
+    }
+
+    const addMember = (e) => {
         if (user) {
-            const newGroup = {userId: new Date().getTime().toString(), username: user};
-            setUsers([...users, newGroup]);
-            localStorage.setItem("localUsers", JSON.stringify([...users, newGroup]));
-            setUser({userId: "", username: "", email: [], isAdmin: ""});
+            // const newGroup = {userId: new Date().getTime().toString(), username: user};
+            // setUsers([...users, newGroup]);
+            // localStorage.setItem("localUsers", JSON.stringify([...users, newGroup]));
+            // setUser({userId: "", username: "", email: "", isAdmin: ""});
+
+            user.userId = uuid()
+            user.role = "member"
+            users.push(user)
+            setUsers(users)
+            console.log(users)
+            setUser({userId: "", username: "", email: "", role: ""})
+            // location.state.members = users
         }
     };
 
@@ -38,23 +64,40 @@ function MemberManagement() {
     return (
         <div className="container row">
             <h1 className="mt-3 text-black">Member Management</h1>
-            <div className="col-8">
+            <div className="col-12">
                 <input
-                    name="user"
+                    name="username"
                     type="text"
                     value={user.username}
-                    placeholder="Add member..."
+                    placeholder="Username..."
                     className="form-control"
-                    onChange={(e) => {
-                        console.log(`element onchange user: `, e);
-                        setUser(e.target.value)
-                    }}
+                    onChange={handleChange}
                 />
             </div>
-            <div className="col-4">
+            <div className="col-12 mt-3">
+                <input
+                    {...register("email", {
+                        required: true,
+                        pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: "Invalid email"
+                        }
+                    })}
+                    name="email"
+                    type="text"
+                    value={user.email}
+                    placeholder="Email..."
+                    className="form-control"
+                    onChange={handleChange}
+
+                />
+                {errors.email && <p className="text-danger">{errors.email.message}</p>}
+            </div>
+            <div className="col-4 justify-content-center"></div>
+            <div className="col-4 justify-content-center mt-3">
                 <button
                     className="btn btn-primary form-control material-icons"
-                    onClick={addGroup}
+                    onClick={handleSubmit(addMember)}
                 >
                     add
                 </button>
