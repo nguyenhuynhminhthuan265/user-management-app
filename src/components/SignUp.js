@@ -43,12 +43,13 @@ function SignUp() {
 
     const onSubmit = (data) => {
         console.log(data)
-        axios.post(`${domainHost}`, {
+        axios.post(`${domainLocal}`, {
             username: data.username,
             email: data.email,
             password: data.password
         })
             .then(res => {
+                    console.log("res: ", res)
                     setUsername('')
                     setEmail('')
                     setPassword('')
@@ -66,7 +67,6 @@ function SignUp() {
                         userId: uuid(),
                         username: data.username,
                         email: data.email,
-                        password: data.password
                     }
 
                     // Check newUser sign up is exist in DB

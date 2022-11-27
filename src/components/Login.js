@@ -5,8 +5,8 @@ import uuid from "react-uuid";
 import {useForm} from "react-hook-form";
 
 function Login() {
-    const domainLocal = `http://127.0.0.1:8085/api/auth/sign-up`
-    const domainHost = `https://auth01-v2.nauht.fun/api/auth/sign-up`
+    const domainLocal = `http://127.0.0.1:8085/api/auth/login`
+    const domainHost = `https://auth01-v2.nauht.fun/api/auth/login`
     const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -16,45 +16,41 @@ function Login() {
 
     const onSubmit = (data) => {
         console.log(data)
-        // axios.post(`${domainHost}`, {
-        //     username: data.username,
-        //     email: data.email,
-        //     password: data.password
-        // })
-        //     .then(res => {
-        //         console.log(res);
-        //         console.log(res.data);
-        //         setUsername('')
-        //         setEmail('')
-        //         setPassword('')
-        //         alert(res.data)
-        //
-        //         localStorage.setItem("sessionId", uuid())
-        //         navigate("/groups")
-        //     })
-        //     .catch(err => {
-        //         console.log(err.response.data)
-        //         alert(err.response.data)
-        //     })
-        let users = JSON.parse(localStorage.getItem("listUserSignUp"));
-        if (users === null) {
-            setIsErrorLogin(true)
-            setMessageError("Account is not found!!!")
-            console.log("Account is not found!!!")
-        }
-
-        for (const user of users) {
-            console.log(user)
-            if (data.email === user.email && data.password === user.password) {
-                localStorage.setItem("sessionId", user.userId)
-                localStorage.setItem("userLogin", JSON.stringify(user))
-
-                navigate('/groups')
-            } else {
+        axios.post(`${domainLocal}`, {
+            username: data.username,
+            email: data.email,
+            password: data.password
+        })
+            .then(res => {
+                console.log(res);
+                // localStorage.setItem("sessionId", user.userId)
+                // localStorage.setItem("userLogin", JSON.stringify(user))
+                // navigate('/groups')
+            })
+            .catch(err => {
+                console.log(err);
                 setIsErrorLogin(true)
                 setMessageError("Check email and password again !!!")
-            }
-        }
+            })
+        // let users = JSON.parse(localStorage.getItem("listUserSignUp"));
+        // if (users === null) {
+        //     setIsErrorLogin(true)
+        //     setMessageError("Account is not found!!!")
+        //     console.log("Account is not found!!!")
+        // }
+
+        // for (const user of users) {
+        //     console.log(user)
+        //     if (data.email === user.email && data.password === user.password) {
+        //         localStorage.setItem("sessionId", user.userId)
+        //         localStorage.setItem("userLogin", JSON.stringify(user))
+        //
+        //         navigate('/groups')
+        //     } else {
+        //         setIsErrorLogin(true)
+        //         setMessageError("Check email and password again !!!")
+        //     }
+        // }
 
     }
 
