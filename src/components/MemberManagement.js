@@ -3,10 +3,13 @@ import {useLocation, useNavigate, useParams} from "react-router-dom";
 import {useForm} from "react-hook-form";
 import uuid from "react-uuid";
 import * as emailjs from "@emailjs/browser";
+import axios from "axios";
 
 function MemberManagement() {
     // const SERVICE_ID = "service_bi5icza";
     // const TEMPLATE_ID = "template_qtotivj";
+    const domainLocal = `http://127.0.0.1:8085`
+    const domainHost = `https://auth01-v2.nauht.fun`
     const {groupId} = useParams()
     const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
     const [user, setUser] = useState({userId: "", username: "", email: "", role: ""});
@@ -19,18 +22,29 @@ function MemberManagement() {
         if (!localStorage.getItem("sessionId")) {
             navigate('/sign-up')
         }
-        if (localStorage.getItem("localUsers")) {
-            const storedList = JSON.parse(localStorage.getItem("localUsers"));
-            setUsers(storedList);
-        }
-        // setUsers(location.state.members ? location.state.members : [])
-        if (localStorage.getItem("mapMembersByGroupId")) {
-            const mapMembersByGroupId = JSON.parse(localStorage.getItem("mapMembersByGroupId"));
-            const members = mapMembersByGroupId[groupId];
-            setUsers(members ? members : []);
-        } else {
-            setUsers([])
-        }
+        // USING API
+        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+        axios.get(`${domainLocal}/api/groups/${groupId}/members`)
+            .then(res => {
+                console.log("res: ", res);
+                setUsers(res?.data);
+            }).catch(err => {
+            console.log(err);
+            alert("Cannot get members");
+        })
+
+        // USING LOCAL
+        // if (localStorage.getItem("localUsers")) {
+        //     const storedList = JSON.parse(localStorage.getItem("localUsers"));
+        //     setUsers(storedList);
+        // }
+        // if (localStorage.getItem("mapMembersByGroupId")) {
+        //     const mapMembersByGroupId = JSON.parse(localStorage.getItem("mapMembersByGroupId"));
+        //     const members = mapMembersByGroupId[groupId];
+        //     setUsers(members ? members : []);
+        // } else {
+        //     setUsers([])
+        // }
     }, [])
 
     function handleChange(evt) {
@@ -44,36 +58,32 @@ function MemberManagement() {
 
     const addMember = (e) => {
         if (user) {
-            // const newGroup = {userId: new Date().getTime().toString(), username: user};
+            const newUser = {userId: new Date().getTime().toString(), username: user.username, email: user.email};
+            console.log(`newUser: `, newUser)
             // setUsers([...users, newGroup]);
             // localStorage.setItem("localUsers", JSON.stringify([...users, newGroup]));
             // setUser({userId: "", username: "", email: "", isAdmin: ""});
+            // user.role = "member"
+            axios.post(`${domainLocal}/api/groups/members`, {
+                groupId: groupId,
+                username: newUser.username,
+                email: newUser.email
+            }).then(res => {
+                console.log("res: ", res)
+                setUsers(res?.data)
+                setUser({userId: "", username: "", email: "", role: ""})
+            }).catch(err => {
+                alert(err?.response?.data)
+            })
+            // users.push(user)
+            // setUsers(users)
+            // console.log(users)
+            // setUser({userId: "", username: "", email: "", role: ""})
 
-            user.userId = uuid()
-            user.role = "member"
-            users.push(user)
-            setUsers(users)
-            console.log(users)
-            setUser({userId: "", username: "", email: "", role: ""})
-
-            // Send mail
-            // let templateParams = {
-            //     name: 'James',
-            //     notes: 'Check this out!'
-            // };
-            //
-            // emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams)
-            //     .then(function (response) {
-            //         console.log('SUCCESS!', response.status, response.text);
-            //     }, function (error) {
-            //         console.log('FAILED...', error);
-            //     });
-            console.log(groupId);
-
-            let mapMembersByGroupId = new Map();
-            mapMembersByGroupId[groupId] = users;
-            console.log(mapMembersByGroupId)
-            localStorage.setItem("mapMembersByGroupId", JSON.stringify(mapMembersByGroupId));
+            // let mapMembersByGroupId = new Map();
+            // mapMembersByGroupId[groupId] = users;
+            // console.log(mapMembersByGroupId)
+            // localStorage.setItem("mapMembersByGroupId", JSON.stringify(mapMembersByGroupId));
         }
     };
 
@@ -95,12 +105,6 @@ function MemberManagement() {
 
     return (
         <div>
-            <div className="d-flex flex-row-reverse bd-highlight">
-                <form id='form-logout' className="p-2 bd-highlight" onSubmit={Logout}>
-                    <button className='btn bg-primary material-icons'>logout</button>
-                </form>
-            </div>
-
             <div className="container row">
                 <h1 className="mt-3 text-black">Member Management</h1>
                 <div className="col-12">

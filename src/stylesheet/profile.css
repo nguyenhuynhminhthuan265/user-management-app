@@ -1,0 +1,62 @@
+#headerProfile {
+    background: linear-gradient(to left, #586759 0%, #074e88 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin: 0 auto;
+    padding-top: 15px;
+    border-radius: 0.25rem;
+
+}
+
+#headerProfile .headerLeft {
+    margin-left: 20px;
+}
+
+#headerProfile .headerLeft img {
+    border-radius: 50%;
+    border: 1px solid transparent;
+}
+
+#headerProfile .headerLeft h5 {
+    color: white;
+}
+
+#headerProfile .headerRight button {
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 0.25rem;
+    border: 0 solid transparent;
+    background-color: #039be5;
+    color: white;
+    margin-bottom: 20px;
+    margin-right: 20px;
+}
+
+.informationProfile {
+    margin-top: 20px;
+}
+
+.informationProfile .title {
+    background-color: #192d3e;
+    padding: 15px 0;
+    border-radius: 0.25rem;
+}
+
+.informationProfile .title h6 {
+    color: white;
+    margin: 0;
+    margin-left: 15px;
+}
+
+.informationProfile .detail {
+    margin-top: 15px;
+}
+
+.informationProfile .detail ul {
+    list-style: none;
+}
+
+.informationProfile .detail ul li span {
+    font-weight: bold;
+}

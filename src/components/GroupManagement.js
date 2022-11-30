@@ -3,40 +3,70 @@ import {useNavigate} from "react-router-dom";
 import axios from "axios";
 
 export default function GroupManagement() {
-    const domainLocal = `http://127.0.0.1:8085/api/groups`
-    const domainHost = `https://auth01-v2.nauht.fun/api/groups`
+    const domainLocal = `http://127.0.0.1:8085`
+    const domainHost = `https://auth01-v2.nauht.fun`
     const [group, setGroup] = useState({groupId: "", groupName: "", members: [], admin: ""});
     const [groups, setGroups] = useState([]);
+    const [isRefresh, setIsRefresh] = useState(true);
     const navigate = useNavigate();
 
     useEffect(() => {
         if (!localStorage.getItem("sessionId")) {
             navigate('/sign-up')
         }
-        if (localStorage.getItem("localGroups")) {
-            const storedList = JSON.parse(localStorage.getItem("localGroups"));
-            setGroups(storedList);
-        }
 
-        if (localStorage.getItem("mapMembersByGroupId")) {
-            const mapMembersByGroupId = JSON.parse(localStorage.getItem("mapMembersByGroupId"));
-            groups.forEach(group => {
-                group.members = mapMembersByGroupId.get(group.groupId)
-            })
-        }
+        //Using API
+        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+        axios.get(`${domainLocal}/api/users/${userLogin.userId}/groups`)
+            .then(res => {
+                console.log("res: ", res);
+                setGroups(res?.data);
+            }).catch(err => {
+            console.log(err);
+            // setIsErrorLogin(true)
+            // setMessageError("Check email and password again !!!")
+        })
+        //Using LOCAL
+        // if (localStorage.getItem("localGroups")) {
+        //     const storedList = JSON.parse(localStorage.getItem("localGroups"));
+        //     setGroups(storedList);
+        // }
+        //
+        // if (localStorage.getItem("mapMembersByGroupId")) {
+        //     const mapMembersByGroupId = JSON.parse(localStorage.getItem("mapMembersByGroupId"));
+        //     groups.forEach(group => {
+        //         group.members = mapMembersByGroupId.get(group.groupId)
+        //     })
+        // }
 
 
-    }, [])
-
+    }, [isRefresh])
+    const addMember = (e) => {
+        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+        axios.post(`${domainLocal}/api/groups/init-members`, {
+            userId: userLogin.userId,
+            groupId: e.groupId
+        }).then(res => {
+            console.log("res: ", res)
+            // const resData = res?.data
+            // setGroups([...groups, resData]);
+            // localStorage.setItem("localGroups", JSON.stringify([...groups, newGroup]));
+            // setGroup({groupId: "", groupName: "", members: [], admin: ""});
+        }).catch(err => {
+            console.log(err)
+            alert(err)
+        })
+    }
     const addGroup = (e) => {
         if (group) {
             const newGroup = {groupId: new Date().getTime().toString(), groupName: group};
-            axios.post(`${domainLocal}`, {
+            axios.post(`${domainLocal}/api/groups`, {
                 groupName: newGroup.groupName
             }).then(res => {
                 console.log("res: ", res)
                 const resData = res?.data
                 setGroups([...groups, resData]);
+                addMember(resData);
                 localStorage.setItem("localGroups", JSON.stringify([...groups, newGroup]));
                 setGroup({groupId: "", groupName: "", members: [], admin: ""});
             }).catch(err => {
@@ -68,11 +98,6 @@ export default function GroupManagement() {
     }
     return (
         <div>
-            <div className="d-flex flex-row-reverse bd-highlight">
-                <form id='form-logout' className="p-2 bd-highlight" onSubmit={Logout}>
-                    <button className='btn bg-primary material-icons'>logout</button>
-                </form>
-            </div>
             <div className="container row">
                 <h1 className="mt-3 text-black">Group Management</h1>
                 <div className="col-8">

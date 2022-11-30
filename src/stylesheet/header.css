@@ -1,0 +1,15 @@
+.dropdownHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: whitesmoke;
+}
+
+.dropdownHeader h2 {
+    font-weight: bold;
+    margin-left: 15px;
+}
+
+.dropdownHeader img {
+    border-radius: 50%;
+}

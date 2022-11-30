@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import {Link, useNavigate} from "react-router-dom";
 import axios from "axios";
 import uuid from "react-uuid";
@@ -14,6 +14,10 @@ function Login() {
     const [messageError, setMessageError] = useState("")
     const navigate = useNavigate()
 
+    useEffect(() => {
+        localStorage.removeItem("sessionId");
+    })
+
     const onSubmit = (data) => {
         console.log(data)
         axios.post(`${domainLocal}`, {
@@ -22,10 +26,11 @@ function Login() {
             password: data.password
         })
             .then(res => {
-                console.log(res);
-                // localStorage.setItem("sessionId", user.userId)
-                // localStorage.setItem("userLogin", JSON.stringify(user))
-                // navigate('/groups')
+                console.log(res.data);
+                const user = res.data;
+                localStorage.setItem("sessionId", user.userId)
+                localStorage.setItem("userLogin", JSON.stringify(user))
+                navigate('/groups')
             })
             .catch(err => {
                 console.log(err);

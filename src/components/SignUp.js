@@ -17,6 +17,9 @@ function SignUp() {
     const [messageError, setMessageError] = useState("")
     const navigate = useNavigate()
 
+    useEffect(() => {
+        localStorage.removeItem("sessionId");
+    })
     const isJsonString = (str) => {
         try {
             JSON.parse(str);
