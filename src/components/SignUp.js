@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 
 function SignUp() {
     const domainLocal = `http://127.0.0.1:8085/api/auth/sign-up`
-    const domainHost = `https://auth01-v2.nauht.fun/api/auth/sign-up`
+    const domainHost = `https://management-app-be.nauht.fun/api/auth/sign-up`
     const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
     const [username, setUsername] = useState('')
     const [email, setEmail] = useState('')
@@ -46,7 +46,7 @@ function SignUp() {
 
     const onSubmit = (data) => {
         console.log(data)
-        axios.post(`${domainLocal}`, {
+        axios.post(`${domainHost}`, {
             username: data.username,
             email: data.email,
             password: data.password
@@ -56,37 +56,41 @@ function SignUp() {
                     setUsername('')
                     setEmail('')
                     setPassword('')
-                    // save user in local -> temporary -> in the future, build back-end API login
-                    let users = localStorage.getItem("listUserSignUp");
-
-                    // Validate null and undefined object
-                    if (users === null || users === undefined) users = []
-
-                    // Validate object is jsonString
-                    if (isJsonString(users)) users = JSON.parse(users)
-                    else users = []
-
-                    const newUser = {
-                        userId: uuid(),
-                        username: data.username,
-                        email: data.email,
-                    }
-
-                    // Check newUser sign up is exist in DB
-                    if (isUserExist(newUser) === true) {
-                        setIsErrorSignUp(true);
-                        setMessageError("User is existed in DB")
-                    } else {
-                        users.push(newUser)
-                        localStorage.setItem("listUserSignUp", JSON.stringify(users))
-                        navigate("/login")
-                    }
+                    setIsErrorSignUp(false);
+                    setMessageError("")
+                    // // save user in local -> temporary -> in the future, build back-end API login
+                    // let users = localStorage.getItem("listUserSignUp");
+                    //
+                    // // Validate null and undefined object
+                    // if (users === null || users === undefined) users = []
+                    //
+                    // // Validate object is jsonString
+                    // if (isJsonString(users)) users = JSON.parse(users)
+                    // else users = []
+                    //
+                    // const newUser = {
+                    //     userId: uuid(),
+                    //     username: data.username,
+                    //     email: data.email,
+                    // }
+                    //
+                    // // Check newUser sign up is exist in DB
+                    // if (isUserExist(newUser) === true) {
+                    //     setIsErrorSignUp(true);
+                    //     setMessageError("User is existed in DB")
+                    // } else {
+                    //     users.push(newUser)
+                    //     localStorage.setItem("listUserSignUp", JSON.stringify(users))
+                    //     navigate("/login")
+                    // }
 
                 }
             )
             .catch(err => {
                 console.log(err)
-                alert(err)
+                // alert(err?.response)
+                setIsErrorSignUp(true);
+                setMessageError(err?.response?.data)
             })
     }
 

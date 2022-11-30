@@ -6,7 +6,7 @@ import axios from "axios";
 
 function UserProfile() {
     const domainLocal = `http://127.0.0.1:8085`
-    const domainHost = `https://auth01-v2.nauht.fun`
+    const domainHost = `https://management-app-be.nauht.fun`
     const navigate = useNavigate();
     const [user, setUser] = useState({userId: "", username: "", email: "", role: ""});
     useEffect(() => {
@@ -14,7 +14,7 @@ function UserProfile() {
         if (userLogin === null || userLogin === undefined) {
             navigate("/login");
         }
-        axios.get(`${domainLocal}/api/users/${userLogin.userId}/profile`)
+        axios.get(`${domainHost}/api/users/${userLogin.userId}/profile`)
             .then(res => {
                 console.log("data: ", res?.data);
                 setUser(res?.data)

@@ -4,7 +4,7 @@ import axios from "axios";
 
 export default function GroupManagement() {
     const domainLocal = `http://127.0.0.1:8085`
-    const domainHost = `https://auth01-v2.nauht.fun`
+    const domainHost = `https://management-app-be.nauht.fun`
     const [group, setGroup] = useState({groupId: "", groupName: "", members: [], admin: ""});
     const [groups, setGroups] = useState([]);
     const [isRefresh, setIsRefresh] = useState(true);
@@ -17,7 +17,7 @@ export default function GroupManagement() {
 
         //Using API
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
-        axios.get(`${domainLocal}/api/users/${userLogin.userId}/groups`)
+        axios.get(`${domainHost}/api/users/${userLogin.userId}/groups`)
             .then(res => {
                 console.log("res: ", res);
                 setGroups(res?.data);
@@ -43,7 +43,7 @@ export default function GroupManagement() {
     }, [isRefresh])
     const addMember = (e) => {
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
-        axios.post(`${domainLocal}/api/groups/init-members`, {
+        axios.post(`${domainHost}/api/groups/init-members`, {
             userId: userLogin.userId,
             groupId: e.groupId
         }).then(res => {
@@ -60,8 +60,10 @@ export default function GroupManagement() {
     const addGroup = (e) => {
         if (group) {
             const newGroup = {groupId: new Date().getTime().toString(), groupName: group};
-            axios.post(`${domainLocal}/api/groups`, {
-                groupName: newGroup.groupName
+            const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+            axios.post(`${domainHost}/api/groups`, {
+                groupName: newGroup.groupName,
+                adminId: userLogin.userId
             }).then(res => {
                 console.log("res: ", res)
                 const resData = res?.data
@@ -77,9 +79,21 @@ export default function GroupManagement() {
     };
 
     const handleDelete = (group) => {
-        const deleted = groups.filter((t) => t.groupId !== group.groupId);
-        setGroups(deleted);
-        localStorage.setItem("localGroups", JSON.stringify(deleted))
+        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+        axios.post(`${domainHost}/api/groups/${group.groupId}/delete`, {
+            groupId: group.groupId,
+            deletedBy: userLogin.userId
+        })
+            .then(res => {
+                console.log("res: ", res)
+                const deleted = groups.filter((t) => t.groupId !== group.groupId);
+                setGroups(deleted);
+                localStorage.setItem("localGroups", JSON.stringify(deleted))
+            }).catch(err => {
+            console.log(err);
+            console.log(err?.response?.data)
+            alert(err?.response?.data)
+        })
     }
 
     const handleClear = () => {
@@ -154,9 +168,9 @@ export default function GroupManagement() {
                 ))}
                 {!groups.length ? null : (
                     <div>
-                        <button className="btn btn-secondary  mt-4 mb-4" onClick={() => handleClear()}>
-                            Clear
-                        </button>
+                        {/*<button className="btn btn-secondary  mt-4 mb-4" onClick={() => handleClear()}>*/}
+                        {/*    Clear*/}
+                        {/*</button>*/}
                     </div>
                 )}
             </div>

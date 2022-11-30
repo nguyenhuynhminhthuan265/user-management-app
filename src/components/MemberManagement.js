@@ -9,7 +9,7 @@ function MemberManagement() {
     // const SERVICE_ID = "service_bi5icza";
     // const TEMPLATE_ID = "template_qtotivj";
     const domainLocal = `http://127.0.0.1:8085`
-    const domainHost = `https://auth01-v2.nauht.fun`
+    const domainHost = `https://management-app-be.nauht.fun`
     const {groupId} = useParams()
     const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
     const [user, setUser] = useState({userId: "", username: "", email: "", role: ""});
@@ -24,7 +24,7 @@ function MemberManagement() {
         }
         // USING API
         const userLogin = JSON.parse(localStorage.getItem("userLogin"));
-        axios.get(`${domainLocal}/api/groups/${groupId}/members`)
+        axios.get(`${domainHost}/api/groups/${groupId}/members`)
             .then(res => {
                 console.log("res: ", res);
                 setUsers(res?.data);
@@ -64,7 +64,7 @@ function MemberManagement() {
             // localStorage.setItem("localUsers", JSON.stringify([...users, newGroup]));
             // setUser({userId: "", username: "", email: "", isAdmin: ""});
             // user.role = "member"
-            axios.post(`${domainLocal}/api/groups/members`, {
+            axios.post(`${domainHost}/api/groups/members`, {
                 groupId: groupId,
                 username: newUser.username,
                 email: newUser.email
@@ -88,16 +88,34 @@ function MemberManagement() {
     };
 
     const handleDelete = (user) => {
-        const deleted = users.filter((t) => t.userId !== user.userId);
-        setUsers(deleted);
-        localStorage.setItem("localUsers", JSON.stringify(deleted))
+        // const deleted = users.filter((t) => t.userId !== user.userId);
+        // setUsers(deleted);
+        // localStorage.setItem("localUsers", JSON.stringify(deleted))
+        const userLogin = JSON.parse(localStorage.getItem("userLogin"));
+        axios.post(`${domainHost}/api/groups/${groupId}/members/${user.userId}/delete`, {
+            groupId: groupId,
+            deletedBy: userLogin.userId,
+            memberId: user.userId
+        })
+            .then(res => {
+                console.log("res: ", res)
+                const deleted = users.filter((t) => t.userId !== user.userId);
+                setUsers(deleted);
+                localStorage.setItem("localUsers", JSON.stringify(deleted))
+            }).catch(err => {
+            console.log(err);
+            console.log(err?.response?.data)
+            alert(err?.response?.data)
+        })
     }
 
     const handleClear = () => {
         setUsers([]);
         localStorage.removeItem("localUsers");
     }
-
+    const handleBack = () => {
+        navigate("/groups")
+    }
     const Logout = () => {
         localStorage.removeItem("sessionId");
         navigate("/login");
@@ -177,9 +195,13 @@ function MemberManagement() {
                 ))}
                 {!users.length ? null : (
                     <div>
-                        <button className="btn btn-secondary  mt-4 mb-4" onClick={() => handleClear()}>
-                            Clear
+                        <button className="btn btn-secondary  mt-4 mb-4 me-5" onClick={() => handleBack()}>
+                            Back
                         </button>
+
+                        {/*<button className="btn btn-secondary  mt-4 mb-4" onClick={() => handleClear()}>*/}
+                        {/*    Clear*/}
+                        {/*</button>*/}
                     </div>
                 )}
             </div>

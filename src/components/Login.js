@@ -6,7 +6,7 @@ import {useForm} from "react-hook-form";
 
 function Login() {
     const domainLocal = `http://127.0.0.1:8085/api/auth/login`
-    const domainHost = `https://auth01-v2.nauht.fun/api/auth/login`
+    const domainHost = `https://management-app-be.nauht.fun/api/auth/login`
     const {register, handleSubmit, watch, setError, formState: {errors}} = useForm()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -20,7 +20,7 @@ function Login() {
 
     const onSubmit = (data) => {
         console.log(data)
-        axios.post(`${domainLocal}`, {
+        axios.post(`${domainHost}`, {
             username: data.username,
             email: data.email,
             password: data.password
